@@ -129,6 +129,7 @@ def view(lid):
         enable=enable,
         award=award,
         results=results,
+        p=len(results["particaiptor"])
     )
 
 
