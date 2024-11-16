@@ -116,7 +116,17 @@ def view(lid):
                 enable = False
             else:
                 if len(results["particaiptor"]) < lot["participator"]:
-                    enable = True
+                    rewards = []
+                    reward_keys = []
+                    for i in lot["rewards"]:
+                        reward_keys.append(i)
+                    for k in reward_keys:
+                        for i in range(lot["rewards"][k][1]):
+                            rewards.append(k)
+                    if rewards:
+                        enable = True
+                    else:
+                        enable = False
                 else:
                     enable = False
     else:
@@ -129,7 +139,7 @@ def view(lid):
         enable=enable,
         award=award,
         results=results,
-        p=len(results["particaiptor"])
+        p=len(results["particaiptor"]) if results else 0
     )
 
 
