@@ -3,9 +3,47 @@
 {% block title %} Lottery {% endblock %}
 
 {% block header %}
-  
+<div class="mt-5 mx-5">
+  <a class="btn btn-primary" href="/lottery/create" role="button">create</a>
+</div>
 {% endblock %}
 
 {% block content %}
-  hello world
+<div class="mt-5 mx-5">
+  {% if now_lottery %}
+  <h3>now_lottery</h3>
+  <hr>
+  <ul class="list-group">
+    {% for lottery in now_lottery %}
+    <li class="list-group-item list-group-item-primary">
+      <a href="/lottery/{{lottery["id"]}}">{{lottery['title']}}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  <div class="mt-5"></div>
+  {% endif %}
+  {% if coming_lottery %}
+  <h3>coming_lottery</h3>
+  <hr>
+  <ul class="list-group">
+    {% for lottery in coming_lottery %}
+    <li class="list-group-item list-group-item-secondary">
+      <a href="/lottery/{{lottery["id"]}}">{{lottery['title']}}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  <div class="mt-5"></div>
+  {% endif %}
+  {% if past_lottery %}
+  <h3>past_lottery</h3>
+  <hr>
+  <ul class="list-group">
+    {% for lottery in past_lottery %}
+    <li class="list-group-item list-group-item-success">
+      <a href="/lottery/{{lottery["id"]}}">{{lottery['title']}}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
 {% endblock %}
