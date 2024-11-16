@@ -40,7 +40,7 @@ def register():
         return redirect("/")
     else:
         # 渲染注册页面
-        return render_template("login_register.html", text="register")
+        return render_template("login_register.html", text="注册")
 
 
 @bp.route("/login", methods=("GET", "POST"))
@@ -65,7 +65,7 @@ def login():
         )
     else:
         message = get_flashed_messages()
-        return render_template("login_register.html", text="login", message=message)
+        return render_template("login_register.html", text="登录", message=message)
 
 
 # https://flask.palletsprojects.com/en/stable/tutorial/views/#require-authentication-in-other-views
