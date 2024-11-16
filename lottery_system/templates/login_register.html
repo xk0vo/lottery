@@ -3,14 +3,20 @@
 {% block title %} {{text}} {% endblock %}
 
 {% block header %}
-
+{% if message %}
+<div class="mx-5 alert alert-warning" role="alert">
+  {% for msg in message %}
+  <div>{{msg}}</div>
+  {% endfor %}
+</div>
+{% endif %}
 {% endblock %}
 
 {% block content %}
 <!-- https://v5.bootcss.com/docs/forms/overview/ -->
 <div class="mx-5">
   <form method="post">
-    <div class="form-floating mb-3 input-group has-validation">
+    <div class="form-floating mb-3 has-validation">
       <!-- https://v5.bootcss.com/docs/forms/floating-labels/ -->
       <input class="form-control {% if error_username %} is-invalid {% endif %}" name="username" id="username"
         placeholder="username" required>
@@ -22,7 +28,8 @@
       <label for="username">username</label>
     </div>
     <div class="form-floating mb-3">
-      <input type="password" class="form-control {% if error_username %} is-invalid {% endif %}" name="password" id="password" placeholder="password" required>
+      <input type="password" class="form-control {% if error_username %} is-invalid {% endif %}" name="password"
+        id="password" placeholder="password" required>
       <label for="password">password</label>
     </div>
     <div class="form-floating mb-3">
