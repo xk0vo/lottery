@@ -6,7 +6,7 @@ if 'users.json' not in os.listdir():
         f.write('{"users": []}')
 if 'lotteries.json' not in os.listdir():
     with open('lotteries.json', 'w') as f:
-        f.write('{"lotteries": []}')
+        f.write('{"lotteries": [], "id": 0}')
 
 def create_app():
     app = Flask(__name__)

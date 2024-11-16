@@ -3,6 +3,13 @@
 {% block title %} create {% endblock %}
 
 {% block header %}
+{% if message %}
+<div class="mx-5 alert alert-warning" role="alert">
+  {% for msg in message %}
+  <div>{{msg}}</div>
+  {% endfor %}
+</div>
+{% endif %}
 <script>
   let rewardid = 0;
   function addElement() {
@@ -18,7 +25,7 @@
     name.required = true;
     name.classList = "form-control";
     name.placeholder = "...";
-    name.id = "reward" + rewardid++;
+    name.name = "reward" + ++rewardid;
     rewarddiv.appendChild(name);
 
     let span2 = document.createElement("span");
@@ -32,7 +39,7 @@
     cnt.min = 1;
     cnt.value = "1";
     cnt.classList = "form-control";
-    cnt.id = "rewardcnt" + rewardid;
+    cnt.name = "rewardcnt" + rewardid;
     rewarddiv.appendChild(cnt);
 
     let close = document.createElement("button");
@@ -72,7 +79,7 @@
             <span class="input-group-text">结束时间</label>
           </div>
           <div class="col-auto">
-            <input class="form-control" name="end_date" type="date" value="{{dat}}">
+            <input class="form-control" name="end_date" type="date" value="{{datt}}">
           </div>
           <div class="col-auto">
             <input class="form-control" name="end_time" type="end_time" value="{{tim}}">
