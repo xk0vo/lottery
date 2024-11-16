@@ -72,6 +72,7 @@ def login():
 def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
+        # 检查用户是否登录
         if session.get("user_id") is None:
             flash("请先登录")
             return redirect(url_for("auth.login"))

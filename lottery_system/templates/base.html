@@ -10,15 +10,15 @@
   <!-- https://v5.bootcss.com/docs/components/navbar/ -->
   <ul class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-      <li class="navbar-brand"><a href="/" class="nav-link active">lottery</a></li>
+      <li class="navbar-brand"><a href="/" class="nav-link active">抽奖</a></li>
       <div class="me-2">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           {% if session.user_id %}
             <li class="nav-item"><a class="nav-link">{{ session.user_id }}</a>
-            <li class="nav-item"><a class="nav-link active" href="{{ url_for('auth.logout') }}">Log Out</a>
+            <li class="nav-item"><a class="nav-link active" href="{{ url_for('auth.logout') }}">登出</a>
           {% else %}
-            <li class="nav-item"><a class="nav-link active" href="{{ url_for('auth.login') }}">Log In</a>
-            <li class="nav-item"><a class="nav-link active" href="{{ url_for('auth.register') }}">Register</a>
+            <li class="nav-item"><a class="nav-link active" href="{{ url_for('auth.login') }}">登录</a>
+            <li class="nav-item"><a class="nav-link active" href="{{ url_for('auth.register') }}">注册</a>
           {% endif %}
         </ul>
       </div>

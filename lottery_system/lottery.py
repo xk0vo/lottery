@@ -20,10 +20,13 @@ def index():
     for lottery in lotes["lotteries"]:
         now = time.time()
         if lottery["end"] < now:
+            # 已结束
             past.append(lottery)
         elif lottery["begin"] > now:
+            # 未开始
             comi.append(lottery)
         else:
+            # 进行中
             curr.append(lottery)
     return render_template(
         "index.html", now_lottery=curr, coming_lottery=comi, past_lottery=past
@@ -36,12 +39,14 @@ def create():
     if request.method == "POST":
         with open("lotteries.json", "r") as f:
             lotes = json.load(f)
+        # 获取表单数据
         form = request.form.to_dict()
         awards = []
         for k in form:
+            # 奖品id
             if k.startswith("rewardcnt"):
                 awards.append(k[9:])
-        if not awards:
+        if not awards:  # 奖品不能为空
             now = datetime.datetime.now()
             new = datetime.datetime.fromtimestamp(time.time() + 86400)
             return render_template(
@@ -58,13 +63,13 @@ def create():
         entry["participator"] = int(form["participator"])
         for i in awards:
             award = [
-                form[f"reward{i}"],
-                int(form[f"rewardcnt{i}"]),
-                int(form[f"rewardcnt{i}"]),
+                form[f"reward{i}"],  # 奖品名称
+                int(form[f"rewardcnt{i}"]),  # 奖品数量
+                int(form[f"rewardcnt{i}"]),  # 奖品剩余数量
             ]
             entry["rewards"][i] = award
-        lotes["lotteries"].append(entry)
-        lotes["id"] += 1
+        lotes["lotteries"].append(entry)  # 添加抽奖活动
+        lotes["id"] += 1  # 更新id
         with open("lotteries.json", "w") as f:
             json.dump(lotes, f)
         return redirect("/")
@@ -81,7 +86,7 @@ def create():
 
 @bp.route("/lottery/<int:lid>")
 def view(lid):
-    enable = True
+    enable = True  # 是否可以参与
     info = os.path.join(".", "lotteries", f"{lid}.json")
     with open("lotteries.json", "r") as f:
         lotes = json.load(f)
@@ -93,7 +98,7 @@ def view(lid):
         return abort(404)
     if f"{lid}.json" not in os.listdir("lotteries"):
         with open(info, "w") as f:
-            d = {"particaiptor": [], "results": {}}
+            d = {"particaiptor": [], "results": {}}  # 参与者，结果
             for i in lot["rewards"]:
                 d["results"][i] = []
             json.dump(d, f)
@@ -113,9 +118,10 @@ def view(lid):
     if lot["begin"] < time.time() < lot["end"]:
         if results:
             if session.get("user_id", None) in results["particaiptor"]:
+                # 已参与
                 enable = False
             else:
-                if len(results["particaiptor"]) < lot["participator"]:
+                if len(results["particaiptor"]) < lot["participator"]:  # 参与人数未满
                     rewards = []
                     reward_keys = []
                     for i in lot["rewards"]:
@@ -139,7 +145,7 @@ def view(lid):
         enable=enable,
         award=award,
         results=results,
-        p=len(results["particaiptor"]) if results else 0
+        p=len(results["particaiptor"]) if results else 0,
     )
 
 
@@ -161,8 +167,8 @@ def draw(lid):
     if f"{lid}.json" not in os.listdir("lotteries"):
         with open(info, "w") as f:
             d = {"particaiptor": [], "results": {}}
-            for i in lot['rewards']:
-                d['results'][i] = []
+            for i in lot["rewards"]:
+                d["results"][i] = []
             json.dump(d, f)
         results = None
     else:
@@ -170,28 +176,29 @@ def draw(lid):
             results = json.load(f)
     reward_keys = []
     for i in lot["rewards"]:
-        reward_keys.append(i)
-
+        reward_keys.append(i) # 奖品id
     if lot["begin"] < time.time() < lot["end"]:
         if results:
-            if session.get("user_id", None) not in results["particaiptor"]:
-                if len(results["particaiptor"]) < lot["participator"]:
+            if session.get("user_id", None) not in results["particaiptor"]:  # 未参与
+                if len(results["particaiptor"]) < lot["participator"]:  # 参与人数未满
                     rewards = []
                     for k in reward_keys:
                         for i in range(lot["rewards"][k][1]):
-                            rewards.append(k)
-                    choice = random.choice(rewards)
-                    lot["rewards"][choice][1] -= 1
-                    results["particaiptor"].append(session.get("user_id"))
+                            rewards.append(k)  # 奖品id
+                    choice = random.choice(rewards)  # 随机选择奖品
+                    lot["rewards"][choice][1] -= 1  # 奖品数量减1
+                    results["particaiptor"].append(session.get("user_id"))  # 添加参与者
                     results["results"][choice].append(
                         [
-                            session.get("user_id"),
-                            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            session.get("user_id"),  # 用户名
+                            datetime.datetime.now().strftime(
+                                "%Y-%m-%d %H:%M:%S"
+                            ),  # 时间
                         ]
                     )
                     with open(info, "w") as f:
-                        json.dump(results, f)
+                        json.dump(results, f)  # 写入结果
                     with open("lotteries.json", "w") as f:
-                        lotes["lotteries"][lotid] = lot
+                        lotes["lotteries"][lotid] = lot  # 更新奖品数量
                         json.dump(lotes, f)
-    return redirect(f"/lottery/{lid}")
+    return redirect(f"/lottery/{lid}")  # 重定向到抽奖页面

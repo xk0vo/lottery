@@ -4,14 +4,14 @@
 
 {% block header %}
 <div class="mt-5 mx-5">
-  <a class="btn btn-primary" href="/lottery/create" role="button">create</a>
+  <a class="btn btn-primary" href="/lottery/create" role="button">创建抽奖</a>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="mt-5 mx-5">
+<div class="mt-5 mx-5 mb-5">
   {% if now_lottery %}
-  <h3>now_lottery</h3>
+  <h3>进行中</h3>
   <hr>
   <ul class="list-group">
     {% for lottery in now_lottery %}
@@ -23,7 +23,7 @@
   <div class="mt-5"></div>
   {% endif %}
   {% if coming_lottery %}
-  <h3>coming_lottery</h3>
+  <h3>未开始</h3>
   <hr>
   <ul class="list-group">
     {% for lottery in coming_lottery %}
@@ -35,7 +35,7 @@
   <div class="mt-5"></div>
   {% endif %}
   {% if past_lottery %}
-  <h3>past_lottery</h3>
+  <h3>已结束</h3>
   <hr>
   <ul class="list-group">
     {% for lottery in past_lottery %}

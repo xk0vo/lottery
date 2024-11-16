@@ -19,18 +19,18 @@
     <div class="form-floating mb-3 has-validation">
       <!-- https://v5.bootcss.com/docs/forms/floating-labels/ -->
       <input class="form-control {% if error_username %} is-invalid {% endif %}" name="username" id="username"
-        placeholder="username" required>
+        placeholder="用户名" required>
       {% if error_username %}
       <div class="invalid-feedback">
         {{error_username}}
       </div>
       {% endif %}
-      <label for="username">username</label>
+      <label for="username">用户名</label>
     </div>
     <div class="form-floating mb-3">
       <input type="password" class="form-control {% if error_username %} is-invalid {% endif %}" name="password"
-        id="password" placeholder="password" required>
-      <label for="password">password</label>
+        id="password" placeholder="密码" required>
+      <label for="password">密码</label>
     </div>
     <div class="form-floating mb-3">
       <button type="submit" class="btn btn-primary">{{text}}</button>
