@@ -2,7 +2,6 @@ import functools
 from flask import (
     Blueprint,
     flash,
-    g,
     get_flashed_messages,
     request,
     render_template,
@@ -77,6 +76,7 @@ def login_required(view):
             flash("请先登录")
             return redirect(url_for("auth.login"))
         return view(**kwargs)
+
     return wrapped_view
 
 

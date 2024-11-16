@@ -1,6 +1,7 @@
+import os
 import json
 import time
-from flask import Blueprint, g, redirect, render_template, request, session, abort
+from flask import Blueprint, redirect, render_template, request, session, abort
 from .auth import login_required
 import datetime
 from dateutil.parser import parse
@@ -75,18 +76,74 @@ def create():
 
 @bp.route("/lottery/<int:lid>")
 def view(lid):
+    info = os.path.join(".", "lotteries", f"{lid}.json")
     with open("lotteries.json", "r") as f:
         lotes = json.load(f)
     lot = None
     for lottery in lotes["lotteries"]:
-        if lottery['id'] == lid:
+        if lottery["id"] == lid:
             lot = lottery
     if not lot:
         return abort(404)
-    b = datetime.datetime.fromtimestamp(lot['begin']).strftime("%Y-%m-%d %H:%M:%S")
-    e = datetime.datetime.fromtimestamp(lot['end']).strftime("%Y-%m-%d %H:%M:%S")
-    if lot['begin'] < time.time() < lot['end']:
-        enable = True
+    if f"{lid}.json" not in os.listdir("lotteries"):
+        with open(info, "w") as f:
+            d = {"particaiptor": [], "results": {}}
+            for i in lot['rewards']:
+                d['results'][i] = []
+            json.dump(d, f)
+        results = None
+        award = None
+    else:
+        award = None
+        with open(info, "r") as f:
+            results = json.load(f)
+        for i in results['results']:
+            for p in results['results'][i]:
+                if p == session.get('user_id', None):
+                    award = lot['rewards'][i][0]
+                    break
+    b = datetime.datetime.fromtimestamp(lot["begin"]).strftime("%Y-%m-%d %H:%M:%S")
+    e = datetime.datetime.fromtimestamp(lot["end"]).strftime("%Y-%m-%d %H:%M:%S")
+    if lot["begin"] < time.time() < lot["end"]:
+        if results:
+            if session.get('user_id', None) in results['particaiptor']:
+                enable = False
+            else:
+                if len(results['particaiptor']) < lot['particaiptor']:
+                    enable = True
+                else:
+                    enable = False
     else:
         enable = False
-    return render_template('lottery.html', lottery=lot, begin=b, end=e, enable=enable)
+    return render_template("lottery.html", lottery=lot, begin=b, end=e, enable=enable, award=award, results=results)
+
+@bp.route("/lottery/<int:lid>/draw")
+def draw(lid):
+    info = os.path.join(".", "lotteries", f"{lid}.json")
+    with open("lotteries.json", "r") as f:
+        lotes = json.load(f)
+    lot = None
+    for lottery in lotes["lotteries"]:
+        if lottery["id"] == lid:
+            lot = lottery
+    if not lot:
+        return abort(404)
+    reward_keys = []
+    if f"{lid}.json" not in os.listdir("lotteries"):
+        with open(info, "w") as f:
+            d = {"particaiptor": [], "results": {}}
+            for i in lot['rewards']:
+                reward_keys.append(i)
+                d['results'][i] = []
+            json.dump(d, f)
+        results = None
+    else:
+        with open(info, "r") as f:
+            results = json.load(f)
+    
+    if lot["begin"] < time.time() < lot["end"]:
+        if results:
+            if session.get('user_id', None) not in results['particaiptor']:
+                if len(results['particaiptor']) < lot['particaiptor']:
+                    ...
+    return redirect(f'/lottery/{lid}')
