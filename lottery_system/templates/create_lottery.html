@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %} create {% endblock %}
+
+{% block header %}
+<script>
+  let rewardid = 0;
+  function addElement() {
+    let rewarddiv = document.createElement("div");
+    rewarddiv.classList = "input-group mt-1 w-75";
+
+    let span1 = document.createElement("span");
+    span1.classList = "input-group-text";
+    span1.textContent = "名称";
+    rewarddiv.appendChild(span1);
+
+    let name = document.createElement("input");
+    name.required = true;
+    name.classList = "form-control";
+    name.placeholder = "...";
+    name.id = "reward" + rewardid++;
+    rewarddiv.appendChild(name);
+
+    let span2 = document.createElement("span");
+    span2.classList = "input-group-text";
+    span2.textContent = "数量";
+    rewarddiv.appendChild(span2);
+
+    let cnt = document.createElement("input");
+    cnt.type = "number";
+    cnt.required = true;
+    cnt.min = 1;
+    cnt.value = "1";
+    cnt.classList = "form-control";
+    cnt.id = "rewardcnt" + rewardid;
+    rewarddiv.appendChild(cnt);
+
+    let close = document.createElement("button");
+    close.classList = "btn-close mx-2";
+    close.onclick = () => {
+      let element = document.getElementById("rewards");
+      element.removeChild(rewarddiv);
+    }
+    rewarddiv.appendChild(close);
+
+    let element = document.getElementById("rewards");
+    element.appendChild(rewarddiv);
+  }
+</script>
+{% endblock %}
+
+{% block content %}
+<form method="post">
+  <div class="mt-5 mx-5">
+    <div class="row">
+      <div class="col-auto">
+        <div class="row">
+          <div class="col-auto">
+            <span class="input-group-text">开始时间</label>
+          </div>
+          <div class="col-auto">
+            <input class="form-control" name="begin_date" type="date" value="{{dat}}">
+          </div>
+          <div class="col-auto">
+            <input class="form-control" name="begin_time" type="begin_time" value="{{tim}}">
+          </div>
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="row">
+          <div class="col-auto">
+            <span class="input-group-text">结束时间</label>
+          </div>
+          <div class="col-auto">
+            <input class="form-control" name="end_date" type="date" value="{{dat}}">
+          </div>
+          <div class="col-auto">
+            <input class="form-control" name="end_time" type="end_time" value="{{tim}}">
+          </div>
+        </div>
+      </div>
+      <div class="input-group mt-4">
+        <span class="input-group-text" id="basic-addon1">参与⼈数</span>
+        <div class="w-25">
+          <input class="form-control" id="participator" name="participator" min="0" type="number" value="1">
+        </div>
+      </div>
+      <div class="mt-4">
+        <button id="add" class="btn btn-primary" onclick="addElement()">添加奖品</button>
+        <button class="btn btn-primary" type="submit">提交</button>
+      </div>
+      <div class="input-group mt-4" id="rewards">
+      </div>
+    </div>
+</form>
+<script>addElement();</script>
+{% endblock %}
