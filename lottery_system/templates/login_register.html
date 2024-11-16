@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %} {{text}} {% endblock %}
+
+{% block header %}
+
+{% endblock %}
+
+{% block content %}
+<!-- https://v5.bootcss.com/docs/forms/overview/ -->
+<div class="mx-5">
+  <form method="post">
+    <div class="form-floating mb-3 input-group has-validation">
+      <!-- https://v5.bootcss.com/docs/forms/floating-labels/ -->
+      <input class="form-control {% if error_username %} is-invalid {% endif %}" name="username" id="username"
+        placeholder="username" required>
+      {% if error_username %}
+      <div class="invalid-feedback">
+        {{error_username}}
+      </div>
+      {% endif %}
+      <label for="username">username</label>
+    </div>
+    <div class="form-floating mb-3">
+      <input type="password" class="form-control" name="password" id="password" placeholder="password" required>
+      <label for="password">password</label>
+    </div>
+    <div class="form-floating mb-3">
+      <button type="submit" class="btn btn-primary">{{text}}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
