@@ -1,5 +1,6 @@
 import os
 import json
+import random
 import time
 from flask import Blueprint, redirect, render_template, request, session, abort
 from .auth import login_required
@@ -56,7 +57,11 @@ def create():
         entry["end"] = parse(f"{form['end_date']} {form['end_time']}").timestamp()
         entry["participator"] = int(form["participator"])
         for i in awards:
-            award = [form[f"reward{i}"], int(form[f"rewardcnt{i}"])]
+            award = [
+                form[f"reward{i}"],
+                int(form[f"rewardcnt{i}"]),
+                int(form[f"rewardcnt{i}"]),
+            ]
             entry["rewards"][i] = award
         lotes["lotteries"].append(entry)
         lotes["id"] += 1
@@ -76,6 +81,7 @@ def create():
 
 @bp.route("/lottery/<int:lid>")
 def view(lid):
+    enable = True
     info = os.path.join(".", "lotteries", f"{lid}.json")
     with open("lotteries.json", "r") as f:
         lotes = json.load(f)
@@ -88,8 +94,8 @@ def view(lid):
     if f"{lid}.json" not in os.listdir("lotteries"):
         with open(info, "w") as f:
             d = {"particaiptor": [], "results": {}}
-            for i in lot['rewards']:
-                d['results'][i] = []
+            for i in lot["rewards"]:
+                d["results"][i] = []
             json.dump(d, f)
         results = None
         award = None
@@ -97,53 +103,84 @@ def view(lid):
         award = None
         with open(info, "r") as f:
             results = json.load(f)
-        for i in results['results']:
-            for p in results['results'][i]:
-                if p == session.get('user_id', None):
-                    award = lot['rewards'][i][0]
+        for i in results["results"]:
+            for p in results["results"][i]:
+                if p[0] == session.get("user_id", None):
+                    award = lot["rewards"][i][0]
                     break
     b = datetime.datetime.fromtimestamp(lot["begin"]).strftime("%Y-%m-%d %H:%M:%S")
     e = datetime.datetime.fromtimestamp(lot["end"]).strftime("%Y-%m-%d %H:%M:%S")
     if lot["begin"] < time.time() < lot["end"]:
         if results:
-            if session.get('user_id', None) in results['particaiptor']:
+            if session.get("user_id", None) in results["particaiptor"]:
                 enable = False
             else:
-                if len(results['particaiptor']) < lot['particaiptor']:
+                if len(results["particaiptor"]) < lot["participator"]:
                     enable = True
                 else:
                     enable = False
     else:
         enable = False
-    return render_template("lottery.html", lottery=lot, begin=b, end=e, enable=enable, award=award, results=results)
+    return render_template(
+        "lottery.html",
+        lottery=lot,
+        begin=b,
+        end=e,
+        enable=enable,
+        award=award,
+        results=results,
+    )
+
 
 @bp.route("/lottery/<int:lid>/draw")
+@login_required
 def draw(lid):
     info = os.path.join(".", "lotteries", f"{lid}.json")
     with open("lotteries.json", "r") as f:
         lotes = json.load(f)
     lot = None
+    lotid = 0
     for lottery in lotes["lotteries"]:
         if lottery["id"] == lid:
             lot = lottery
+            break
+        lotid += 1
     if not lot:
         return abort(404)
-    reward_keys = []
     if f"{lid}.json" not in os.listdir("lotteries"):
         with open(info, "w") as f:
             d = {"particaiptor": [], "results": {}}
             for i in lot['rewards']:
-                reward_keys.append(i)
                 d['results'][i] = []
             json.dump(d, f)
         results = None
     else:
         with open(info, "r") as f:
             results = json.load(f)
-    
+    reward_keys = []
+    for i in lot["rewards"]:
+        reward_keys.append(i)
+
     if lot["begin"] < time.time() < lot["end"]:
         if results:
-            if session.get('user_id', None) not in results['particaiptor']:
-                if len(results['particaiptor']) < lot['particaiptor']:
-                    ...
-    return redirect(f'/lottery/{lid}')
+            if session.get("user_id", None) not in results["particaiptor"]:
+                if len(results["particaiptor"]) < lot["participator"]:
+                    rewards = []
+                    for k in reward_keys:
+                        for i in range(lot["rewards"][k][1]):
+                            rewards.append(k)
+                    choice = random.choice(rewards)
+                    lot["rewards"][choice][1] -= 1
+                    results["particaiptor"].append(session.get("user_id"))
+                    results["results"][choice].append(
+                        [
+                            session.get("user_id"),
+                            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        ]
+                    )
+                    with open(info, "w") as f:
+                        json.dump(results, f)
+                    with open("lotteries.json", "w") as f:
+                        lotes["lotteries"][lotid] = lot
+                        json.dump(lotes, f)
+    return redirect(f"/lottery/{lid}")
