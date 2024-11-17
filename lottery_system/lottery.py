@@ -42,7 +42,7 @@ def create():
             lotes = json.load(f)
         # 获取表单数据
         form = request.form.to_dict()
-        if form["participator"] <= 0:
+        if int(form["participator"]) <= 0:
             now = datetime.datetime.now()
             new = datetime.datetime.fromtimestamp(time.time() + 86400)
             return render_template(
