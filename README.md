@@ -74,3 +74,4 @@ waitress-serve --host 0.0.0.0 --call lottery_system:create_app
 导出结果
 ![](imgs/img7.png)
 
+---
