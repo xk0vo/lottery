@@ -123,7 +123,7 @@ def view(lid):
         return abort(404)  # 未找到抽奖活动
     if f"{lid}.json" not in os.listdir("lotteries"):
         with open(info, "w") as f:
-            d = {"particaiptor": [], "results": {}}  # 参与者，结果
+            d = {"participator": [], "results": {}}  # 参与者，结果
             for i in lot["rewards"]:
                 d["results"][i] = []
             json.dump(d, f)  # 写入结果
@@ -145,11 +145,11 @@ def view(lid):
     # 结束时间
     if lot["begin"] < time.time() < lot["end"]:
         if results:
-            if session.get("user_id", None) in results["particaiptor"]:
+            if session.get("user_id", None) in results["participator"]:
                 # 已参与
                 enable = False
             else:
-                if len(results["particaiptor"]) < lot["participator"]:  # 参与人数未满
+                if len(results["participator"]) < lot["participator"]:  # 参与人数未满
                     rewards = []
                     reward_keys = []
                     for i in lot["rewards"]:
@@ -175,7 +175,7 @@ def view(lid):
         enable=enable,
         award=award,
         results=results,
-        p=len(results["particaiptor"]) if results else 0,
+        p=len(results["participator"]) if results else 0,
     )
 
 
@@ -196,7 +196,7 @@ def draw(lid):
         return abort(404)
     if f"{lid}.json" not in os.listdir("lotteries"):
         with open(info, "w") as f:
-            d = {"particaiptor": [], "results": {}}
+            d = {"participator": [], "results": {}}
             for i in lot["rewards"]:
                 d["results"][i] = []
             json.dump(d, f)
@@ -209,15 +209,15 @@ def draw(lid):
         reward_keys.append(i)  # 奖品id
     if lot["begin"] < time.time() < lot["end"]:
         if results:
-            if session.get("user_id", None) not in results["particaiptor"]:  # 未参与
-                if len(results["particaiptor"]) < lot["participator"]:  # 参与人数未满
+            if session.get("user_id", None) not in results["participator"]:  # 未参与
+                if len(results["participator"]) < lot["participator"]:  # 参与人数未满
                     rewards = []
                     for k in reward_keys:
                         for i in range(lot["rewards"][k][1]):
                             rewards.append(k)  # 奖品id
                     choice = random.choice(rewards)  # 随机选择奖品
                     lot["rewards"][choice][1] -= 1  # 奖品数量减1
-                    results["particaiptor"].append(session.get("user_id"))  # 添加参与者
+                    results["participator"].append(session.get("user_id"))  # 添加参与者
                     results["results"][choice].append(
                         [
                             session.get("user_id"),  # 用户名
