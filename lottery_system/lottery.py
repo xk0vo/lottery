@@ -2,6 +2,7 @@ import os
 import json
 import random
 import time
+import dateutil
 from flask import Blueprint, redirect, render_template, request, session, abort
 from .auth import login_required
 import datetime
@@ -41,6 +42,16 @@ def create():
             lotes = json.load(f)
         # 获取表单数据
         form = request.form.to_dict()
+        if form["participator"] <= 0:
+            now = datetime.datetime.now()
+            new = datetime.datetime.fromtimestamp(time.time() + 86400)
+            return render_template(
+                "create_lottery.html",
+                dat=f'{now.strftime("%Y-%m-%d")}',
+                datt=f'{new.strftime("%Y-%m-%d")}',
+                tim=f'{now.strftime("%H:%M")}',
+                message=["参与人数应大于0"],
+            )
         awards = []
         for k in form:
             # 奖品id
@@ -58,8 +69,22 @@ def create():
             )
         entry = {"uid": session.get("user_id"), "id": lotes["id"], "rewards": {}}
         entry["title"] = form["title"]
-        entry["begin"] = parse(f"{form['begin_date']} {form['begin_time']}").timestamp()
-        entry["end"] = parse(f"{form['end_date']} {form['end_time']}").timestamp()
+        try:
+            entry["begin"] = parse(
+                f"{form['begin_date']} {form['begin_time']}"
+            ).timestamp()
+            entry["end"] = parse(f"{form['end_date']} {form['end_time']}").timestamp()
+        except dateutil.parser._parser.ParserError as e:
+            # 日期格式错误
+            now = datetime.datetime.now()
+            new = datetime.datetime.fromtimestamp(time.time() + 86400)
+            return render_template(
+                "create_lottery.html",
+                dat=f'{now.strftime("%Y-%m-%d")}',
+                datt=f'{new.strftime("%Y-%m-%d")}',
+                tim=f'{now.strftime("%H:%M")}',
+                message=[e.args[0] % e.args[1]],
+            )
         entry["participator"] = int(form["participator"])
         for i in awards:
             award = [
@@ -95,13 +120,13 @@ def view(lid):
         if lottery["id"] == lid:
             lot = lottery
     if not lot:
-        return abort(404)
+        return abort(404)  # 未找到抽奖活动
     if f"{lid}.json" not in os.listdir("lotteries"):
         with open(info, "w") as f:
             d = {"particaiptor": [], "results": {}}  # 参与者，结果
             for i in lot["rewards"]:
                 d["results"][i] = []
-            json.dump(d, f)
+            json.dump(d, f)  # 写入结果
         results = None
         award = None
     else:
@@ -111,10 +136,13 @@ def view(lid):
         for i in results["results"]:
             for p in results["results"][i]:
                 if p[0] == session.get("user_id", None):
+                    # 已中奖
                     award = lot["rewards"][i][0]
                     break
     b = datetime.datetime.fromtimestamp(lot["begin"]).strftime("%Y-%m-%d %H:%M:%S")
+    # 开始时间
     e = datetime.datetime.fromtimestamp(lot["end"]).strftime("%Y-%m-%d %H:%M:%S")
+    # 结束时间
     if lot["begin"] < time.time() < lot["end"]:
         if results:
             if session.get("user_id", None) in results["particaiptor"]:
@@ -126,10 +154,12 @@ def view(lid):
                     reward_keys = []
                     for i in lot["rewards"]:
                         reward_keys.append(i)
+                        # 奖品id
                     for k in reward_keys:
                         for i in range(lot["rewards"][k][1]):
                             rewards.append(k)
-                    if rewards:
+                            # 奖品id
+                    if rewards:  # 奖品不为空
                         enable = True
                     else:
                         enable = False
@@ -176,7 +206,7 @@ def draw(lid):
             results = json.load(f)
     reward_keys = []
     for i in lot["rewards"]:
-        reward_keys.append(i) # 奖品id
+        reward_keys.append(i)  # 奖品id
     if lot["begin"] < time.time() < lot["end"]:
         if results:
             if session.get("user_id", None) not in results["particaiptor"]:  # 未参与

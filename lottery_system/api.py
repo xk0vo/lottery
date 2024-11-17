@@ -44,6 +44,6 @@ def export(lid):
             data.append([user[0], user[1], v])
     f = "\n".join([",".join(i) for i in data])
     buf = io.BytesIO()
-    buf.write(f.encode(encoding="gbk"))
+    buf.write(f.encode(encoding="gbk"))  # 防止中文乱码
     buf.seek(0)
     return send_file(buf, mimetype="text/csv")
