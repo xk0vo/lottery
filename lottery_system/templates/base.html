@@ -1,34 +1,47 @@
-<!doctype html>
-<!-- https://flask.palletsprojects.com/en/stable/tutorial/templates/ -->
-<title>{% block title %}{% endblock %}</title>
-<!-- https://v5.bootcss.com/docs/getting-started/download/ -->
-<link href="https://npm.elemecdn.com/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://npm.elemecdn.com/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-<!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
+<!DOCTYPE html>
+<html lang="en">
 
-<nav>
-  <!-- https://v5.bootcss.com/docs/components/navbar/ -->
-  <ul class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <li class="navbar-brand"><a href="/" class="nav-link active">抽奖</a></li>
-      <div class="me-2">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          {% if session.user_id %}
+<head>
+  <!-- https://flask.palletsprojects.com/en/stable/tutorial/templates/ -->
+  <title>{% block title %}{% endblock %}</title>
+  <!-- https://v5.bootcss.com/docs/getting-started/download/ -->
+  <link href="https://npm.elemecdn.com/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    crossorigin="anonymous">
+  <script src="https://npm.elemecdn.com/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"></script>
+  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+  <nav>
+    <!-- https://v5.bootcss.com/docs/components/navbar/ -->
+    <ul class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <li class="navbar-brand"><a href="/" class="nav-link active">抽奖</a></li>
+        <div class="me-2">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% if session.user_id %}
             <li class="nav-item"><a class="nav-link">{{ session.user_id }}</a>
             <li class="nav-item"><a class="nav-link active" href="{{ url_for('auth.logout') }}">登出</a>
-          {% else %}
+              {% else %}
             <li class="nav-item"><a class="nav-link active" href="{{ url_for('auth.login') }}">登录</a>
             <li class="nav-item"><a class="nav-link active" href="{{ url_for('auth.register') }}">注册</a>
-          {% endif %}
-        </ul>
-      </div>
-  </ul>
-  </div>
-</nav>
+              {% endif %}
+          </ul>
+        </div>
+    </ul>
+    </div>
+  </nav>
 
-<section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
-  {% block content %}{% endblock %}
-</section>
+  <section class="content">
+    <header>
+      {% block header %}{% endblock %}
+    </header>
+    {% block content %}{% endblock %}
+  </section>
+
+</body>
+
+</html>
